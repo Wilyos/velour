@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import bgProduct from '../assets/img/bg-product.png';
-import shampooFront from '../assets/img/shampooFront.png';
-import shampooBack from '../assets/img/shampooBack.png';
+import shampooFront from '../assets/img/shampoofront.png';
+import shampooBack from '../assets/img/shampooback.png';
 import { FaStar } from "react-icons/fa";
 import Contact from '../components/Concact.jsx';
 import payCard from '../assets/iconos/pay-card.png'
