@@ -2,8 +2,8 @@ import Header from "../components/Header"
 import { useState } from "react";
 import Footer from "../components/Footer"
 import bgProduct from '../assets/img/bg-product.png';
-import ttmFront from '../assets/img/fondo-mg.png';
-import ttmBack from '../assets/img/fondo-mg.png';
+import ttmFront from '../assets/img/tratamiento.png';
+import ttmBack from '../assets/img/tratamiento2.png';
 import { FaStar } from "react-icons/fa";
 import Concact from '../components/Concact.jsx';
 import payCard from '../assets/iconos/pay-card.png'
@@ -28,7 +28,7 @@ const Tratamiento = () => {
                 <div className="lg:w-1/2 w-full flex flex-col items-center">
                   <img
                     alt="producto principal"
-                    className="w-full h-auto object-cover rounded"
+                    className="w-full h-auto object-cover rounded-xl"
                     src={mainImage}
                   />
     
