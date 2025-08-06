@@ -45,7 +45,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'API de Velour funcionando' });
 });
 
-// Health check endpoint
+// Health check endpoints
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
