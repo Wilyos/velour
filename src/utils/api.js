@@ -1,11 +1,11 @@
 // Utilidad para obtener la URL base de la API
 export const getApiUrl = () => {
-  // En producción, usar la variable de entorno
+  // En producción, usar la URL de Railway
   if (import.meta.env.PROD) {
-    return import.meta.env.VITE_API_URL || '';
+    return import.meta.env.VITE_API_URL || 'https://velour-production.up.railway.app';
   }
   // En desarrollo, usar localhost
-  return '';
+  return 'http://localhost:5000';
 };
 
 // Función helper para hacer requests a la API
