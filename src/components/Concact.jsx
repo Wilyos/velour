@@ -95,7 +95,7 @@ const Concact = () => {
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="w-full sm:w-auto bg-white text-primary font-bold px-6 py-3 sm:py-2 rounded-none border-l-0 sm:border-l border-secondary hover:bg-primary hover:text-secondary transition-colors duration-200 text-lg md:text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-white text-primary font-bold px-6 py-3 sm:py-2 rounded-none border-l-0 sm:border-l border-secondary hover:bg-morado hover:text-secondary transition-colors duration-200 text-lg md:text-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Suscribiendo...' : 'Suscribirse'}
               </button>
