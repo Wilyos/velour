@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import bgContact from '../assets/img/bg-concact.png';
 import { FaFacebookF, FaTiktok, FaYoutube, FaInstagram } from "react-icons/fa";
+import { apiRequest } from '../utils/api';
 
 const Concact = () => {
   const [email, setEmail] = useState('');
@@ -27,12 +28,8 @@ const Concact = () => {
     setMessage('');
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/subscriptions/subscribe`, {
+      const response = await apiRequest('/api/subscriptions/subscribe', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email })
       });
 

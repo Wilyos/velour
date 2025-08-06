@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { apiRequest } from '../utils/api';
 
 const AdminDashboard = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -29,11 +30,10 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('token');
       const headers = {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
       };
 
       // Cargar estadísticas del dashboard
-      const dashboardResponse = await fetch('/api/admin/dashboard', { headers });
+      const dashboardResponse = await apiRequest('/api/admin/dashboard', { headers });
       if (dashboardResponse.ok) {
         const dashboardData = await dashboardResponse.json();
         setStats(dashboardData.stats);
@@ -51,11 +51,10 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/admin/campaigns', {
+      const response = await apiRequest('/api/admin/campaigns', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
         },
         body: JSON.stringify(newCampaign)
       });
@@ -77,11 +76,10 @@ const AdminDashboard = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/admin/campaigns/${campaignId}/send`, {
+      const response = await apiRequest(`/api/admin/campaigns/${campaignId}/send`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
         }
       });
 

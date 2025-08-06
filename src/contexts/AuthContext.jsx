@@ -1,4 +1,5 @@
 import { useState, useContext, createContext } from 'react';
+import { apiRequest } from '../utils/api';
 
 // Contexto de autenticación
 const AuthContext = createContext();
@@ -19,11 +20,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await apiRequest('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email, password })
       });
 
@@ -56,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     if (!token) return;
 
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await apiRequest('/api/auth/me', {
         headers: {
           Authorization: `Bearer ${token}`
         }
