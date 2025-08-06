@@ -1,14 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 
-
-
 export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
     "./node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
     "./node_modules/flowbite/**/*.js"
-
   ],
   theme: {
     extend: {
@@ -22,7 +19,6 @@ export default {
       }
     },
   },
-  plugins: [
-  ],
-  darkMode: "class"
+  plugins: [],
+  // Removido darkMode para deshabilitar completamente el modo oscuro
 }
