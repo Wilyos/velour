@@ -1,0 +1,9 @@
+[build]
+buildCommand = "npm ci"
+
+[start]
+cmd = "npm start"
+
+[variables]
+NODE_VERSION = "18"
+NPM_VERSION = "9"
