@@ -9,7 +9,7 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, 'https://tu-dominio.netlify.app'] 
+    ? [process.env.FRONTEND_URL, 'https://velourvitalize.com', 'https://www.velourvitalize.com'] 
     : ['http://localhost:3000', 'http://localhost:5173'],
   credentials: true
 }));

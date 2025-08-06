@@ -2,6 +2,11 @@
 
 Sistema completo de suscripciones por email con panel de administración para gestión de campañas y suscriptores.
 
+## 🌐 **SITIO EN VIVO**
+- **Frontend**: https://velourvitalize.com
+- **Backend API**: https://velour-production.up.railway.app
+- **Panel Admin**: https://velourvitalize.com/admin/login
+
 ## 🚀 Características
 
 ### Frontend
@@ -14,10 +19,19 @@ Sistema completo de suscripciones por email con panel de administración para ge
 ### Backend
 - ✅ API REST completa
 - ✅ Autenticación JWT
-- ✅ Base de datos MongoDB
-- ✅ Sistema de emails con plantillas HTML
+- ✅ Base de datos MongoDB Atlas
+- ✅ Sistema de emails con Gmail SMTP
 - ✅ Gestión de campañas de email
-- ✅ Panel de estadísticas
+- ✅ Panel de estadísticas en tiempo real
+
+## 🏗️ **ARQUITECTURA DE PRODUCCIÓN**
+
+### Stack Tecnológico
+- **Frontend**: React + Vite + Tailwind CSS → Netlify → velourvitalize.com
+- **Backend**: Node.js + Express + MongoDB → Railway
+- **Base de Datos**: MongoDB Atlas (Cluster0)
+- **Email Service**: Gmail SMTP
+- **Dominio**: velourvitalize.com (Dominio personalizado)
 
 ## 📋 Prerrequisitos
 
