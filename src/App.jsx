@@ -8,12 +8,12 @@ import Shampoo from "./Pages/Shampoo";
 import Tratamiento from "./Pages/Tratamiento";
 import FormContact from "./Pages/FormContact";
 import SearchResults from "./Pages/SearchResults";
+import AdminLogin from "./Pages/AdminLogin";
+import AdminDashboard from "./Pages/AdminDashboard";
+import { AuthProvider } from "./contexts/AuthContext";
 import { useState } from "react";
 
-
-
 function HomePage() {
-
    const [searchTerm, setSearchTerm] = useState(""); 
   return (
     <>
@@ -28,14 +28,17 @@ function HomePage() {
 
 function App() {
   return (
+    <AuthProvider>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/shampoo" element={<Shampoo />} />
         <Route path="/tratamiento" element={<Tratamiento/>} />
         <Route path="/form" element={<FormContact />} />
         <Route path="/search" element={<SearchResults />} />  
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
-    
+    </AuthProvider>
   );
 }
 

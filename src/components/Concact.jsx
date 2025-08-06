@@ -1,8 +1,60 @@
+import { useState } from 'react';
 import bgContact from '../assets/img/bg-concact.png';
 import { FaFacebookF, FaTiktok, FaYoutube, FaInstagram } from "react-icons/fa";
 
-
 const Concact = () => {
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!email) {
+      setMessage('Por favor ingresa tu email');
+      setMessageType('error');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setMessage('Por favor ingresa un email válido');
+      setMessageType('error');
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/subscriptions/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(data.message);
+        setMessageType('success');
+        setEmail(''); // Limpiar el formulario
+      } else {
+        setMessage(data.message || 'Error al suscribirse');
+        setMessageType('error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('Error de conexión. Por favor intenta más tarde.');
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section 
       className="text-primary yanone-kaffeesatz relative min-h-screen flex items-center"
@@ -33,20 +85,36 @@ const Concact = () => {
           </h2>
           
           {/* Formulario de suscripción */}
-          <div className="flex w-full justify-center items-center mb-8 md:mb-12 px-2">
+          <form onSubmit={handleSubmit} className="flex w-full justify-center items-center mb-4 md:mb-8 px-2">
             <div className="flex flex-col sm:flex-row items-center w-full max-w-2xl bg-secondary/50 rounded-full border border-secondary overflow-hidden">
               <input
                 type="email"
-                id="hero-field"
-                name="hero-field"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="✉ Correo Electrónico"
                 className="w-full bg-transparent text-base outline-none text-gray-700 py-3 px-4 sm:py-2 text-center sm:text-left"
+                disabled={isLoading}
               />
-              <button className="w-full sm:w-auto bg-white text-primary font-bold px-6 py-3 sm:py-2 rounded-none border-l-0 sm:border-l border-secondary hover:bg-primary hover:text-secondary transition-colors duration-200 text-lg md:text-xl">
-                Suscribirse
+              <button 
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto bg-white text-primary font-bold px-6 py-3 sm:py-2 rounded-none border-l-0 sm:border-l border-secondary hover:bg-primary hover:text-secondary transition-colors duration-200 text-lg md:text-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Suscribiendo...' : 'Suscribirse'}
               </button>
             </div>
-          </div>
+          </form>
+
+          {/* Mensaje de estado */}
+          {message && (
+            <div className={`mb-4 md:mb-8 px-4 py-3 rounded-lg text-center max-w-2xl w-full ${
+              messageType === 'success' 
+                ? 'bg-green-100 text-green-800 border border-green-300' 
+                : 'bg-red-100 text-red-800 border border-red-300'
+            }`}>
+              {message}
+            </div>
+          )}
           
           {/* Redes sociales */}
           <div className="flex flex-col items-center text-center">
