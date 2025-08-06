@@ -124,33 +124,33 @@ const Concact = () => {
                 href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
               >
-                <FaInstagram className="text-lg md:text-xl" />
+                <FaInstagram className="text-lg md:text-xl hover:text-secondary" />
               </a>
               <a 
                 href="https://facebook.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
               >
-                <FaFacebookF className="text-lg md:text-xl" />
+                <FaFacebookF className="text-lg md:text-xl hover:text-secondary" />
               </a>
               <a 
                 href="https://tiktok.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
               >
-                <FaTiktok className="text-lg md:text-xl" />
+                <FaTiktok className="text-lg md:text-xl hover:text-secondary" />
               </a>
               <a 
                 href="https://youtube.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
               >
-                <FaYoutube className="text-lg md:text-xl" />
+                <FaYoutube className="text-lg md:text-xl hover:text-secondary" />
               </a>
             </div>
           </div>
