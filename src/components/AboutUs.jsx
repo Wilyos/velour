@@ -1,6 +1,7 @@
 import bannerA from '../assets/banners/banner-2.png';
 import bannerB from '../assets/banners/banner-about-us.png';
 import { HiArrowLongRight } from "react-icons/hi2";
+import { Link } from 'react-router-dom';
 
 
 const AboutUs = () => {
@@ -27,7 +28,7 @@ const AboutUs = () => {
                             <h1 className='yanone-kaffeesatz text-5xl font-semibold mb-4'>NOS ENCANTA</h1>
                         
                             <h2 class="text-accent font-medium title-font tracking-wider text-2xl cormorant-garamond mb-7 leading-none">
-                                Encuentra tus favoritos conel poder de la naturaleza
+                                Encuentra tus favoritos con el poder de la naturaleza
                             </h2>
                             <a href="#" className='text-accent yanone-kaffeesatz font-semibold'>Inspírate con Velour</a>
                         </div>
@@ -65,13 +66,13 @@ const AboutUs = () => {
                 <div class="relative rounded-lg h-64 min-w-24 overflow-hidden">
                     <img alt="content" class="object-cover object-center h-full w-full z-0" src="/assets/about-model2.jpg" />
                     <div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-morado text-secondary p-1 content-center items-center rounded-full text-2xl w-32 text-center  hover:bg-secondary hover:text-morado'>
-                        <a href="#" className=''>Shampoo</a>
+                        <Link to="/shampoo" className=''>Shampoo</Link>
                     </div>
                 </div>
                 <div class="relative rounded-lg h-64 overflow-hidden">
                     <img alt="content" class="object-cover object-center h-full w-full" src="/assets/about-model1.png" />
                     <div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-morado text-secondary p-1 content-center items-center rounded-full text-2xl w-32 text-center  hover:bg-secondary hover:text-morado'>
-                        <a href="#" className=''>Tratamiento</a>
+                        <Link to="/tratamiento" className=''>Tratamiento</Link>
                     </div>
                 </div>
               

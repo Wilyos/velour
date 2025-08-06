@@ -7,14 +7,20 @@ import Hero from "./components/Hero";
 import Shampoo from "./Pages/Shampoo";
 import Tratamiento from "./Pages/Tratamiento";
 import FormContact from "./Pages/FormContact";
+import SearchResults from "./Pages/SearchResults";
+import { useState } from "react";
+
+
 
 function HomePage() {
+
+   const [searchTerm, setSearchTerm] = useState(""); 
   return (
     <>
-      <Header />
+      <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <Hero />
-      <AboutUs />
-      <Concact />
+      <AboutUs searchTerm={searchTerm}/>
+      <Concact searchTerm={searchTerm}/>
       <Footer />
     </>
   );
@@ -22,14 +28,14 @@ function HomePage() {
 
 function App() {
   return (
-    <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/shampoo" element={<Shampoo />} />
         <Route path="/tratamiento" element={<Tratamiento/>} />
-        <Route path="/form" element={<FormContact />} />  
+        <Route path="/form" element={<FormContact />} />
+        <Route path="/search" element={<SearchResults />} />  
       </Routes>
-    </Router>
+    
   );
 }
 

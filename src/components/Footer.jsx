@@ -26,8 +26,8 @@ const Footer = () => {
         <div className="w-full md:w-1/3 px-4 text-center md:text-left mb-6 md:mb-0">
             <h2 className="title-font font-medium text-white tracking-widest text-3xl mb-3">CATEGORÍAS</h2>
             <nav className="list-none text-2xl font-light">
-            <li><Link className="text-white hover:text-accent cursor-pointer">Shampoo</Link></li>
-            <li><Link className="text-white hover:text-accent cursor-pointer">Tratamiento</Link></li>
+            <li><Link className="text-white hover:text-accent cursor-pointer"to='/shampoo'>Shampoo</Link></li>
+            <li><Link className="text-white hover:text-accent cursor-pointer"to='/tratamiento'>Tratamiento</Link></li>
             </nav>
         </div>
 
