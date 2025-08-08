@@ -93,14 +93,49 @@ router.get('/confirm/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
-    const subscription = await Subscription.findOne({ 
-      confirmationToken: token,
-      isConfirmed: false
+    // Primero buscar cualquier suscripción con ese token (confirmada o no)
+    let subscription = await Subscription.findOne({ 
+      confirmationToken: token
     });
 
+    // Si no se encuentra, buscar si hay una suscripción ya confirmada con ese token borrado
     if (!subscription) {
+      // El token podría haber sido borrado después de la confirmación
+      subscription = await Subscription.findOne({ 
+        confirmationToken: null,
+        isConfirmed: true
+      });
+      
+      if (subscription) {
+        // Si hay una suscripción confirmada, probablemente este token ya fue usado
+        return res.json({
+          message: '¡Tu suscripción ya está confirmada! Ya formas parte de la familia Velour.',
+          subscription: {
+            id: subscription._id,
+            email: subscription.email,
+            isConfirmed: subscription.isConfirmed,
+            confirmedAt: subscription.confirmedAt
+          },
+          alreadyConfirmed: true
+        });
+      }
+      
       return res.status(400).json({ 
-        message: 'Token de confirmación inválido o suscripción ya confirmada' 
+        message: 'Token de confirmación inválido. El enlace puede haber expirado.' 
+      });
+    }
+
+    // Si la suscripción ya está confirmada
+    if (subscription.isConfirmed) {
+      return res.json({
+        message: '¡Tu suscripción ya está confirmada! Ya formas parte de la familia Velour.',
+        subscription: {
+          id: subscription._id,
+          email: subscription.email,
+          isConfirmed: subscription.isConfirmed,
+          confirmedAt: subscription.confirmedAt
+        },
+        alreadyConfirmed: true
       });
     }
 
@@ -114,13 +149,14 @@ router.get('/confirm/:token', async (req, res) => {
     await emailService.sendWelcomeEmail(subscription.email);
 
     res.json({
-      message: 'Suscripción confirmada exitosamente. ¡Bienvenido a Velour!',
+      message: '¡Suscripción confirmada exitosamente! Bienvenido/a a Velour.',
       subscription: {
         id: subscription._id,
         email: subscription.email,
         isConfirmed: subscription.isConfirmed,
         confirmedAt: subscription.confirmedAt
-      }
+      },
+      alreadyConfirmed: false
     });
 
   } catch (error) {
