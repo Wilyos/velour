@@ -308,10 +308,15 @@ router.post('/campaigns', [
 
     const { subject, content, type, scheduleFor } = req.body;
 
+    // Crear versión de texto simple del HTML
+    const textContent = content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+
     const campaign = new EmailCampaign({
-      subject,
-      content,
-      type,
+      title: subject, // Usar subject como título
+      subject: subject,
+      htmlContent: content, // Mapear content a htmlContent
+      textContent: textContent, // Generar versión texto
+      templateType: type, // Mapear type a templateType
       createdBy: req.user._id,
       scheduleFor: scheduleFor ? new Date(scheduleFor) : null
     });
@@ -320,7 +325,14 @@ router.post('/campaigns', [
 
     res.status(201).json({
       message: 'Campaña creada exitosamente',
-      campaign
+      campaign: {
+        id: campaign._id,
+        title: campaign.title,
+        subject: campaign.subject,
+        status: campaign.status,
+        templateType: campaign.templateType,
+        createdAt: campaign.createdAt
+      }
     });
 
   } catch (error) {
@@ -370,8 +382,8 @@ router.post('/campaigns/:id/send', auth, isAdmin, async (req, res) => {
           await emailService.sendCampaignEmail(
             subscriber.email, 
             campaign.subject, 
-            campaign.content,
-            campaign.type
+            campaign.htmlContent,
+            campaign.textContent
           );
           successCount++;
         } catch (emailError) {
