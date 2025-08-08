@@ -10,6 +10,8 @@ const AdminDashboard = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [subscriptionFilter, setSubscriptionFilter] = useState('all');
+  const [deletingSubscriptions, setDeletingSubscriptions] = useState(false);
 
   // Estados para nueva campaña
   const [showCampaignForm, setShowCampaignForm] = useState(false);
@@ -24,6 +26,12 @@ const AdminDashboard = () => {
       loadDashboardData();
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (activeTab === 'subscriptions' && isAuthenticated) {
+      loadAllSubscriptions();
+    }
+  }, [activeTab, subscriptionFilter, isAuthenticated]);
 
   const loadDashboardData = async () => {
     try {
@@ -40,10 +48,104 @@ const AdminDashboard = () => {
         setSubscriptions(dashboardData.recentSubscriptions);
         setCampaigns(dashboardData.recentCampaigns);
       }
+
+      // Si estamos en la pestaña de suscripciones, cargar todas las suscripciones
+      if (activeTab === 'subscriptions') {
+        await loadAllSubscriptions();
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAllSubscriptions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      const params = new URLSearchParams();
+      if (subscriptionFilter !== 'all') {
+        params.append('status', subscriptionFilter);
+      }
+
+      const response = await apiRequest(`/api/admin/subscriptions?${params}`, { headers });
+      if (response.ok) {
+        const data = await response.json();
+        setSubscriptions(data.subscriptions);
+      }
+    } catch (error) {
+      console.error('Error loading subscriptions:', error);
+    }
+  };
+
+  const deletePendingSubscriptions = async () => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar TODAS las suscripciones pendientes? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    setDeletingSubscriptions(true);
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      const response = await apiRequest('/api/admin/subscriptions/pending', { 
+        method: 'DELETE',
+        headers 
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+        // Recargar los datos
+        await loadDashboardData();
+        if (activeTab === 'subscriptions') {
+          await loadAllSubscriptions();
+        }
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + errorData.message);
+      }
+    } catch (error) {
+      console.error('Error deleting pending subscriptions:', error);
+      alert('Error al eliminar suscripciones pendientes');
+    } finally {
+      setDeletingSubscriptions(false);
+    }
+  };
+
+  const deleteSubscription = async (subscriptionId) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta suscripción?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      const response = await apiRequest(`/api/admin/subscriptions/${subscriptionId}`, { 
+        method: 'DELETE',
+        headers 
+      });
+
+      if (response.ok) {
+        // Remover de la lista local
+        setSubscriptions(prev => prev.filter(sub => sub._id !== subscriptionId));
+        alert('Suscripción eliminada exitosamente');
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + errorData.message);
+      }
+    } catch (error) {
+      console.error('Error deleting subscription:', error);
+      alert('Error al eliminar suscripción');
     }
   };
 
@@ -232,10 +334,74 @@ const AdminDashboard = () => {
         {activeTab === 'subscriptions' && (
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Gestión de Suscripciones</h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium text-gray-900">Gestión de Suscripciones</h3>
+                <div className="flex gap-3">
+                  <select
+                    value={subscriptionFilter}
+                    onChange={(e) => setSubscriptionFilter(e.target.value)}
+                    className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  >
+                    <option value="all">Todas</option>
+                    <option value="confirmed">Confirmadas</option>
+                    <option value="pending">Pendientes</option>
+                    <option value="unsubscribed">Canceladas</option>
+                  </select>
+                  <button
+                    onClick={deletePendingSubscriptions}
+                    disabled={deletingSubscriptions}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deletingSubscriptions ? 'Eliminando...' : 'Eliminar Pendientes'}
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="p-6">
-              <p className="text-gray-600">Funcionalidad de gestión de suscripciones en desarrollo...</p>
+              <div className="space-y-4">
+                {subscriptions.length === 0 ? (
+                  <p className="text-gray-600 text-center py-8">
+                    No hay suscripciones {subscriptionFilter !== 'all' ? `${subscriptionFilter}` : ''} para mostrar.
+                  </p>
+                ) : (
+                  subscriptions.map((subscription) => (
+                    <div key={subscription._id} className="flex justify-between items-center py-3 px-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">{subscription.email}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Creado: {new Date(subscription.createdAt).toLocaleDateString()} a las {new Date(subscription.createdAt).toLocaleTimeString()}
+                          {subscription.confirmedAt && (
+                            <span className="ml-4">
+                              Confirmado: {new Date(subscription.confirmedAt).toLocaleDateString()} a las {new Date(subscription.confirmedAt).toLocaleTimeString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          subscription.isConfirmed && subscription.isActive
+                            ? 'bg-green-100 text-green-800' 
+                            : subscription.isConfirmed && !subscription.isActive
+                            ? 'bg-gray-100 text-gray-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {subscription.isConfirmed && subscription.isActive
+                            ? 'Confirmado' 
+                            : subscription.isConfirmed && !subscription.isActive
+                            ? 'Cancelado'
+                            : 'Pendiente'}
+                        </span>
+                        <button
+                          onClick={() => deleteSubscription(subscription._id)}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
