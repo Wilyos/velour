@@ -190,6 +190,68 @@ const AdminDashboard = () => {
     }
   };
 
+  const resendConfirmationEmail = async (subscriptionId) => {
+    if (!window.confirm('¿Reenviar email de confirmación con nuevo token?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      const response = await apiRequest(`/api/admin/subscriptions/${subscriptionId}/resend`, { 
+        method: 'PUT',
+        headers 
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+        // Recargar los datos
+        await loadAllSubscriptions();
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + errorData.message);
+      }
+    } catch (error) {
+      console.error('Error resending confirmation:', error);
+      alert('Error al reenviar confirmación');
+    }
+  };
+
+  const confirmSubscriptionManually = async (subscriptionId) => {
+    if (!window.confirm('¿Confirmar esta suscripción manualmente?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      const response = await apiRequest(`/api/admin/subscriptions/${subscriptionId}/confirm`, { 
+        method: 'PUT',
+        headers 
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+        // Recargar los datos
+        await loadAllSubscriptions();
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + errorData.message);
+      }
+    } catch (error) {
+      console.error('Error confirming subscription:', error);
+      alert('Error al confirmar suscripción');
+    }
+  };
+
   const handleCreateCampaign = async (e) => {
     e.preventDefault();
     try {
@@ -426,7 +488,7 @@ const AdminDashboard = () => {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           subscription.isConfirmed && subscription.isActive
                             ? 'bg-green-100 text-green-800' 
@@ -440,12 +502,35 @@ const AdminDashboard = () => {
                             ? 'Cancelado'
                             : 'Pendiente'}
                         </span>
-                        <button
-                          onClick={() => deleteSubscription(subscription._id)}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium"
-                        >
-                          Eliminar
-                        </button>
+                        
+                        {/* Botones de acción */}
+                        <div className="flex gap-1">
+                          {!subscription.isConfirmed && (
+                            <>
+                              <button
+                                onClick={() => resendConfirmationEmail(subscription._id)}
+                                className="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 rounded hover:bg-blue-50"
+                                title="Reenviar email de confirmación"
+                              >
+                                📧 Reenviar
+                              </button>
+                              <button
+                                onClick={() => confirmSubscriptionManually(subscription._id)}
+                                className="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 rounded hover:bg-green-50"
+                                title="Confirmar manualmente"
+                              >
+                                ✅ Confirmar
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => deleteSubscription(subscription._id)}
+                            className="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 rounded hover:bg-red-50"
+                            title="Eliminar suscripción"
+                          >
+                            🗑️ Eliminar
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
