@@ -10,18 +10,28 @@ const ConfirmSubscription = () => {
   useEffect(() => {
     const confirmSubscription = async () => {
       try {
+        console.log('🔄 Intentando confirmar token:', token);
         const response = await apiRequest(`/api/subscriptions/confirm/${token}`);
+        console.log('📡 Respuesta recibida:', {
+          status: response.status,
+          ok: response.ok,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+        
         const data = await response.json();
+        console.log('📋 Datos de respuesta:', data);
         
         if (response.ok) {
+          console.log('✅ Respuesta OK, estableciendo success');
           setStatus('success');
           setMessage(data.message);
         } else {
+          console.log('❌ Respuesta no OK, estableciendo error');
           setStatus('error');
           setMessage(data.message || 'Error al confirmar la suscripción');
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('💥 Error capturado:', error);
         setStatus('error');
         setMessage('Error de conexión. Por favor intenta más tarde.');
       }
@@ -142,8 +152,8 @@ const ConfirmSubscription = () => {
         
         <p className="text-xs text-gray-500 mt-6">
           ¿Tienes problemas? Contáctanos en{' '}
-          <a href="mailto:correos.sistemaslit@gmail.com" className="text-primary hover:underline">
-            correos.sistemaslit@gmail.com
+          <a href="mailto:velourvitalize@gmail.com" className="text-primary hover:underline">
+            velourvitalize@gmail.com
           </a>
         </p>
       </div>
