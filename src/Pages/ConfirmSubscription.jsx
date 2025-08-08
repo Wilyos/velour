@@ -11,15 +11,14 @@ const ConfirmSubscription = () => {
     const confirmSubscription = async () => {
       try {
         const response = await apiRequest(`/api/subscriptions/confirm/${token}`);
+        const data = await response.json();
         
         if (response.ok) {
-          const data = await response.json();
           setStatus('success');
           setMessage(data.message);
         } else {
-          const errorData = await response.json();
           setStatus('error');
-          setMessage(errorData.message || 'Error al confirmar la suscripción');
+          setMessage(data.message || 'Error al confirmar la suscripción');
         }
       } catch (error) {
         console.error('Error:', error);
