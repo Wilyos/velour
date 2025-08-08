@@ -330,26 +330,49 @@ const AdminDashboard = () => {
 
   const handleCreateCampaign = async (e) => {
     e.preventDefault();
+    console.log('🚀 Iniciando creación de campaña...');
+    console.log('📋 Datos del formulario:', newCampaign);
+    
     try {
       const token = localStorage.getItem('token');
+      console.log('🔑 Token encontrado:', token ? 'Sí' : 'No');
+      
+      // Validación básica
+      if (!newCampaign.subject || !newCampaign.title || !newCampaign.mainMessage) {
+        alert('Por favor completa los campos obligatorios: Asunto, Título Principal y Mensaje Principal');
+        return;
+      }
       
       // Generar el HTML automáticamente
+      console.log('🎨 Generando HTML...');
       const generatedHTML = generateCampaignHTML(newCampaign);
+      console.log('✨ HTML generado (primeros 200 chars):', generatedHTML.substring(0, 200) + '...');
       
       const campaignToSend = {
-        ...newCampaign,
-        content: generatedHTML
+        subject: newCampaign.subject,
+        content: generatedHTML,
+        type: newCampaign.type
       };
+      
+      console.log('📤 Enviando campaña al servidor:', campaignToSend);
       
       const response = await apiRequest('/api/admin/campaigns', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(campaignToSend)
       });
 
+      console.log('📡 Respuesta del servidor:', {
+        status: response.status,
+        ok: response.ok
+      });
+
       if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Campaña creada exitosamente:', data);
         alert('Campaña creada exitosamente');
         setShowCampaignForm(false);
         setNewCampaign({ 
@@ -364,10 +387,14 @@ const AdminDashboard = () => {
           footer: ''
         });
         loadDashboardData();
+      } else {
+        const errorData = await response.json();
+        console.error('❌ Error del servidor:', errorData);
+        alert('Error del servidor: ' + (errorData.message || 'Error desconocido'));
       }
     } catch (error) {
-      console.error('Error creating campaign:', error);
-      alert('Error al crear la campaña');
+      console.error('💥 Error capturado:', error);
+      alert('Error al crear la campaña: ' + error.message);
     }
   };
 
