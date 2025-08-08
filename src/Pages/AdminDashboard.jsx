@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { apiRequest } from '../utils/api';
 
 const AdminDashboard = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, updateActivity } = useAuth();
   const [stats, setStats] = useState(null);
   const [subscriptions, setSubscriptions] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
@@ -12,6 +12,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [subscriptionFilter, setSubscriptionFilter] = useState('all');
   const [deletingSubscriptions, setDeletingSubscriptions] = useState(false);
+  const [sessionTimer, setSessionTimer] = useState('');
 
   // Estados para nueva campaña
   const [showCampaignForm, setShowCampaignForm] = useState(false);
@@ -20,6 +21,46 @@ const AdminDashboard = () => {
     content: '',
     type: 'newsletter'
   });
+
+  // Actualizar timer de sesión
+  useEffect(() => {
+    const updateSessionTimer = () => {
+      const lastActivity = localStorage.getItem('lastActivity');
+      if (lastActivity) {
+        const timeSinceActivity = Date.now() - parseInt(lastActivity);
+        const remainingTime = (10 * 60 * 1000) - timeSinceActivity; // 10 minutos - tiempo transcurrido
+        
+        if (remainingTime > 0) {
+          const minutes = Math.floor(remainingTime / 60000);
+          const seconds = Math.floor((remainingTime % 60000) / 1000);
+          setSessionTimer(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+        } else {
+          setSessionTimer('0:00');
+        }
+      }
+    };
+
+    const interval = setInterval(updateSessionTimer, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Detectar actividad del usuario en el dashboard
+  useEffect(() => {
+    const handleActivity = () => {
+      updateActivity();
+    };
+
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach(event => {
+      document.addEventListener(event, handleActivity, { passive: true });
+    });
+
+    return () => {
+      activityEvents.forEach(event => {
+        document.removeEventListener(event, handleActivity);
+      });
+    };
+  }, [updateActivity]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -221,9 +262,17 @@ const AdminDashboard = () => {
               <span className="ml-3 text-gray-500">Panel de Administración</span>
             </div>
             <div className="flex items-center space-x-4">
+              {/* Indicador de tiempo de sesión */}
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-gray-600">Sesión:</span>
+                  <span className="font-mono text-gray-800">{sessionTimer}</span>
+                </div>
+              </div>
               <span className="text-sm text-gray-700">Hola, {user?.name}</span>
               <button
-                onClick={logout}
+                onClick={() => logout('manual')}
                 className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
               >
                 Cerrar Sesión

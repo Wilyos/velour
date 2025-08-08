@@ -4,6 +4,7 @@ import Concact from "./components/Concact";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
+import LoadingSpinner from "./components/LoadingSpinner";
 import Shampoo from "./Pages/Shampoo";
 import Tratamiento from "./Pages/Tratamiento";
 import FormContact from "./Pages/FormContact";
@@ -11,8 +12,23 @@ import SearchResults from "./Pages/SearchResults";
 import AdminLogin from "./Pages/AdminLogin";
 import AdminDashboard from "./Pages/AdminDashboard";
 import ConfirmSubscription from "./Pages/ConfirmSubscription";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { useState } from "react";
+
+// Componente para proteger rutas de admin
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingSpinner message="Verificando autenticación..." />;
+  }
+  
+  if (!isAuthenticated) {
+    return <AdminLogin />;
+  }
+  
+  return children;
+}
 
 function HomePage() {
    const [searchTerm, setSearchTerm] = useState(""); 
@@ -38,7 +54,11 @@ function App() {
         <Route path="/search" element={<SearchResults />} />  
         <Route path="/confirm-subscription/:token" element={<ConfirmSubscription />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
       </Routes>
     </AuthProvider>
   );
