@@ -1,6 +1,16 @@
-# Velour Backend - Railway Deployment
+# Velour Backend - Railway D# Email Service (YA CONFIGURADO)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=correos.sistemaslit@gmail.com
+EMAIL_PASS=rsbjeqngrkoaayat
+FROM_NAME=Velour
+FROM_EMAIL=velourvitalize@gmail.com
 
-Este backend está configurado para desplegarse en Railway.
+# Frontend URL (ACTUALIZAR CON TU DOMINIO DE NETLIFY)
+FRONTEND_URL=https://velourvitalize.com
+
+# Producción (IMPORTANTE - AGREGAR ESTA VARIABLE)
+NODE_ENV=productionEste backend está configurado para desplegarse en Railway.
 
 ## Configuración Paso a Paso en Railway
 
