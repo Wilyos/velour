@@ -168,6 +168,7 @@ router.put('/subscriptions/:id/confirm', auth, isAdmin, async (req, res) => {
     subscription.isConfirmed = true;
     subscription.isActive = true;
     subscription.confirmedAt = new Date();
+    subscription.confirmationToken = null; // Limpiar token usado
     await subscription.save();
     
     res.json({ 
@@ -180,6 +181,84 @@ router.put('/subscriptions/:id/confirm', auth, isAdmin, async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 });
+
+// @route   PUT /api/admin/subscriptions/:id/resend
+// @desc    Reenviar email de confirmación con nuevo token
+// @access  Private/Admin
+router.put('/subscriptions/:id/resend', auth, isAdmin, async (req, res) => {
+  try {
+    const subscription = await Subscription.findById(req.params.id);
+    
+    if (!subscription) {
+      return res.status(404).json({ message: 'Suscripción no encontrada' });
+    }
+
+    if (subscription.isConfirmed) {
+      return res.status(400).json({ message: 'La suscripción ya está confirmada' });
+    }
+
+    // Generar nuevo token de confirmación
+    const crypto = require('crypto');
+    const newToken = crypto.randomBytes(32).toString('hex');
+    
+    subscription.confirmationToken = newToken;
+    await subscription.save();
+
+    // Reenviar email de confirmación
+    const emailService = require('../services/emailService');
+    await emailService.sendConfirmationEmail(subscription.email, newToken);
+    
+    res.json({ 
+      message: 'Email de confirmación reenviado exitosamente',
+      subscription: {
+        id: subscription._id,
+        email: subscription.email,
+        newToken: newToken.substring(0, 8) + '...' // Solo mostrar parte del token por seguridad
+      }
+    });
+
+  } catch (error) {
+    console.error('Error reenviando confirmación:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   GET /api/admin/subscriptions
+// @desc    Obtener todas las suscripciones con paginación
+// @access  Private/Admin
+router.get('/subscriptions', auth, isAdmin, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const status = req.query.status; // 'confirmed', 'pending', 'unsubscribed'
+    const search = req.query.search;
+
+    // Construir filtros
+    let filter = {};
+    if (status === 'confirmed') {
+      filter = { isConfirmed: true, isActive: true };
+    } else if (status === 'pending') {
+      filter = { isConfirmed: false };
+    } else if (status === 'unsubscribed') {
+      filter = { isActive: false };
+    }
+
+    if (search) {
+      filter.email = { $regex: search, $options: 'i' };
+    }
+
+    const total = await Subscription.countDocuments(filter);
+    const subscriptions = await Subscription.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    res.json({
+      subscriptions,
+      pagination: {
+        current: page,
+        pages: Math.ceil(total / limit),
+        total,
         limit
       }
     });
