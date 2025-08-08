@@ -31,6 +31,14 @@ class EmailService {
 
   // Email de confirmación de suscripción
   async sendConfirmationEmail(email, token) {
+    console.log('EmailService: Sending confirmation email to:', email, 'with token:', token?.substring(0, 8) + '...');
+    
+    // Verificar que el token no sea null o undefined
+    if (!token) {
+      console.error('ERROR: Token is null or undefined!');
+      throw new Error('Token de confirmación no válido');
+    }
+    
     // Forzar el uso de la URL de producción si no está en desarrollo local
     const isLocalDev = process.env.NODE_ENV !== 'production' && !process.env.RAILWAY_ENVIRONMENT_NAME;
     const baseUrl = isLocalDev 
@@ -46,6 +54,7 @@ class EmailService {
     });
     
     const confirmUrl = `${baseUrl}/confirm-subscription/${token}`;
+    console.log('Confirmation URL generated:', confirmUrl);
     
     const htmlContent = `
       <!DOCTYPE html>

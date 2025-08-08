@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
+const crypto = require('crypto');
 const Subscription = require('../models/Subscription');
 const emailService = require('../services/emailService');
 
@@ -44,7 +45,13 @@ router.post('/subscribe', [
           message: 'Este email ya está suscrito' 
         });
       } else {
-        // Reenviar email de confirmación si no está confirmado
+        // Generar nuevo token si no tiene o si el actual es null
+        if (!subscription.confirmationToken) {
+          subscription.confirmationToken = crypto.randomBytes(32).toString('hex');
+          await subscription.save();
+        }
+        
+        // Reenviar email de confirmación
         await emailService.sendConfirmationEmail(subscription.email, subscription.confirmationToken);
         return res.json({ 
           message: 'Email de confirmación reenviado. Por favor revisa tu bandeja de entrada.' 
@@ -52,11 +59,16 @@ router.post('/subscribe', [
       }
     }
 
-    // Crear nueva suscripción
-    subscription = new Subscription({ email });
+    // Crear nueva suscripción con token de confirmación
+    const confirmationToken = crypto.randomBytes(32).toString('hex');
+    subscription = new Subscription({ 
+      email,
+      confirmationToken: confirmationToken 
+    });
     await subscription.save();
 
     // Enviar email de confirmación
+    console.log('Sending confirmation email to:', subscription.email, 'with token:', subscription.confirmationToken?.substring(0, 8) + '...');
     await emailService.sendConfirmationEmail(subscription.email, subscription.confirmationToken);
 
     res.status(201).json({
