@@ -211,6 +211,162 @@ class EmailService {
       return false;
     }
   }
+
+  // Email de notificación de contacto al equipo
+  async sendContactNotification(contactData) {
+    const { fullName, documentNumber, email, phone, message, contactId } = contactData;
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Nuevo Contacto - Velour</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #8B443F; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 10px 10px; border: 1px solid #ddd; }
+          .field { margin-bottom: 15px; }
+          .label { font-weight: bold; color: #8B443F; }
+          .value { background: white; padding: 10px; border-radius: 5px; margin-top: 5px; }
+          .message-box { background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #8B443F; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🆕 Nuevo Contacto de Velour</h1>
+            <p>Un cliente se ha comunicado contigo</p>
+          </div>
+          <div class="content">
+            <div class="field">
+              <div class="label">👤 Nombre Completo:</div>
+              <div class="value">${fullName}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">🆔 Documento:</div>
+              <div class="value">${documentNumber}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">📧 Email:</div>
+              <div class="value">${email}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">📱 Teléfono:</div>
+              <div class="value">${phone}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">💬 Mensaje:</div>
+              <div class="message-box">${message}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">🆔 ID de Contacto:</div>
+              <div class="value">${contactId}</div>
+            </div>
+            
+            <div class="field">
+              <div class="label">⏰ Fecha:</div>
+              <div class="value">${new Date().toLocaleString('es-CO')}</div>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Este mensaje fue enviado desde el formulario de contacto de velourvitalize.com</p>
+            <p>© 2025 Velour. Panel de administración.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      await this.getTransporter().sendMail({
+        from: `"Formulario Velour" <${process.env.EMAIL_USER}>`,
+        to: 'velourvitalize@gmail.com',
+        subject: `🆕 Nuevo contacto de ${fullName} - Velour`,
+        html: htmlContent
+      });
+      return true;
+    } catch (error) {
+      console.error('Error enviando notificación de contacto:', error);
+      return false;
+    }
+  }
+
+  // Email de confirmación al cliente que envió el contacto
+  async sendContactConfirmation(email, fullName) {
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Mensaje Recibido - Velour</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #D4A574, #B8956A); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+          .cta-button { display: inline-block; background: #8B443F; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>¡Mensaje Recibido! 📩</h1>
+            <p>Gracias por contactar a Velour</p>
+          </div>
+          <div class="content">
+            <p>Hola <strong>${fullName}</strong>,</p>
+            <p>¡Gracias por contactarnos! Hemos recibido tu mensaje exitosamente.</p>
+            
+            <p>Nuestro equipo revisará tu consulta y te responderemos a la brevedad posible, generalmente dentro de las próximas 24 horas hábiles.</p>
+            
+            <p>Mientras tanto, te invitamos a:</p>
+            <ul>
+              <li>🛍️ Explorar nuestros productos en la tienda</li>
+              <li>💡 Seguir nuestros tips de cuidado capilar</li>
+              <li>📱 Seguirnos en redes sociales para novedades</li>
+            </ul>
+            
+            <div style="text-align: center;">
+              <a href="https://velourvitalize.com" class="cta-button">Visitar Tienda</a>
+            </div>
+            
+            <p>Si tu consulta es urgente, también puedes contactarnos directamente:</p>
+            <p>📧 <strong>velourvitalize@gmail.com</strong></p>
+            
+            <p>¡Gracias por confiar en Velour!</p>
+            <p>Con cariño,<br>El equipo de Velour 💜</p>
+          </div>
+          <div class="footer">
+            <p>Este es un mensaje automático de confirmación.</p>
+            <p>© 2025 Velour. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      await this.getTransporter().sendMail({
+        from: `"Velour" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: '✅ Hemos recibido tu mensaje - Velour',
+        html: htmlContent
+      });
+      return true;
+    } catch (error) {
+      console.error('Error enviando confirmación de contacto:', error);
+      return false;
+    }
+  }
 }
 
 module.exports = new EmailService();

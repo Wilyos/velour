@@ -39,6 +39,7 @@ const { router: authRouter } = require('./routes/auth');
 app.use('/api/auth', authRouter);
 app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/contacts', require('./routes/contacts'));
 
 // Ruta de prueba
 app.get('/', (req, res) => {

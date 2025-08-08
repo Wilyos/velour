@@ -5,6 +5,22 @@ const emailService = require('../services/emailService');
 
 const router = express.Router();
 
+// @route   GET /api/subscriptions/debug-env
+// @desc    Debug endpoint para verificar variables de entorno
+// @access  Public (temporal para debugging)
+router.get('/debug-env', (req, res) => {
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? (process.env.FRONTEND_URL || 'https://velourvitalize.com')
+    : 'http://localhost:5173';
+    
+  res.json({
+    NODE_ENV: process.env.NODE_ENV,
+    FRONTEND_URL: process.env.FRONTEND_URL,
+    baseUrl: baseUrl,
+    confirmUrl: `${baseUrl}/confirm-subscription/test-token`
+  });
+});
+
 // @route   POST /api/subscriptions/subscribe
 // @desc    Suscribirse al newsletter
 // @access  Public
