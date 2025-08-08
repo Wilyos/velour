@@ -31,7 +31,12 @@ class EmailService {
 
   // Email de confirmación de suscripción
   async sendConfirmationEmail(email, token) {
-    const confirmUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/confirm-subscription/${token}`;
+    // Usar la URL correcta según el entorno
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? (process.env.FRONTEND_URL || 'https://velourvitalize.com')
+      : 'http://localhost:5173';
+    
+    const confirmUrl = `${baseUrl}/confirm-subscription/${token}`;
     
     const htmlContent = `
       <!DOCTYPE html>
@@ -157,7 +162,7 @@ class EmailService {
             </div>
             
             <div style="text-align: center;">
-              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}" class="cta-button">EXPLORAR PRODUCTOS</a>
+              <a href="${process.env.NODE_ENV === 'production' ? (process.env.FRONTEND_URL || 'https://velourvitalize.com') : 'http://localhost:5173'}" class="cta-button">EXPLORAR PRODUCTOS</a>
             </div>
             
             <p>Como miembro de nuestra comunidad, serás el primero en conocer:</p>

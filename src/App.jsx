@@ -10,6 +10,7 @@ import FormContact from "./Pages/FormContact";
 import SearchResults from "./Pages/SearchResults";
 import AdminLogin from "./Pages/AdminLogin";
 import AdminDashboard from "./Pages/AdminDashboard";
+import ConfirmSubscription from "./Pages/ConfirmSubscription";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useState } from "react";
 
@@ -35,6 +36,7 @@ function App() {
         <Route path="/tratamiento" element={<Tratamiento/>} />
         <Route path="/form" element={<FormContact />} />
         <Route path="/search" element={<SearchResults />} />  
+        <Route path="/confirm-subscription/:token" element={<ConfirmSubscription />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
