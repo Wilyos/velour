@@ -35,7 +35,7 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/20 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/20 flex items-center justify-center p-4 yanone-kaffeesatz"> ">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         {/* Logo y título */}
         <div className="text-center mb-8">

@@ -1,5 +1,6 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
 const { auth } = require('./auth');
 const Subscription = require('../models/Subscription');
 const EmailCampaign = require('../models/EmailCampaign');
@@ -420,15 +421,22 @@ router.post('/campaigns/:id/send', auth, isAdmin, async (req, res) => {
 });
 
 // @route   GET /api/admin/campaigns
-// @desc    Obtener todas las campañas
+// @desc    Obtener todas las campañas con filtros
 // @access  Private/Admin
 router.get('/campaigns', auth, isAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 20;
+    const status = req.query.status; // 'draft', 'sent', 'sending', 'failed'
 
-    const total = await EmailCampaign.countDocuments();
-    const campaigns = await EmailCampaign.find()
+    // Construir filtros
+    let filter = {};
+    if (status && status !== 'all') {
+      filter.status = status;
+    }
+
+    const total = await EmailCampaign.countDocuments(filter);
+    const campaigns = await EmailCampaign.find(filter)
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 })
       .limit(limit)
@@ -497,6 +505,183 @@ router.get('/export/subscriptions', auth, isAdmin, async (req, res) => {
 
   } catch (error) {
     console.error('Error exportando suscripciones:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   DELETE /api/admin/campaigns/:id
+// @desc    Eliminar una campaña
+// @access  Private/Admin
+router.delete('/campaigns/:id', auth, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Buscar la campaña
+    const campaign = await EmailCampaign.findById(id);
+    if (!campaign) {
+      return res.status(404).json({ message: 'Campaña no encontrada' });
+    }
+
+    // Solo permitir eliminar campañas en borrador o fallidas
+    if (campaign.status === 'sending') {
+      return res.status(400).json({ message: 'No se puede eliminar una campaña que se está enviando' });
+    }
+
+    await EmailCampaign.findByIdAndDelete(id);
+
+    res.json({ message: 'Campaña eliminada exitosamente' });
+
+  } catch (error) {
+    console.error('Error eliminando campaña:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   POST /api/admin/campaigns/:id/duplicate
+// @desc    Duplicar una campaña
+// @access  Private/Admin
+router.post('/campaigns/:id/duplicate', auth, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Buscar la campaña original
+    const originalCampaign = await EmailCampaign.findById(id);
+    if (!originalCampaign) {
+      return res.status(404).json({ message: 'Campaña no encontrada' });
+    }
+
+    // Crear una nueva campaña con los datos de la original
+    const duplicatedCampaign = new EmailCampaign({
+      subject: `${originalCampaign.subject} (Copia)`,
+      htmlContent: originalCampaign.htmlContent,
+      textContent: originalCampaign.textContent,
+      templateType: originalCampaign.templateType,
+      status: 'draft',
+      createdBy: req.user._id,
+      // No copiar estadísticas de envío
+      sentCount: 0,
+      deliveredCount: 0,
+      failedCount: 0,
+      openCount: 0,
+      clickCount: 0
+    });
+
+    await duplicatedCampaign.save();
+    await duplicatedCampaign.populate('createdBy', 'name email');
+
+    res.status(201).json(duplicatedCampaign);
+
+  } catch (error) {
+    console.error('Error duplicando campaña:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   POST /api/admin/campaigns/:id/resend
+// @desc    Reenviar una campaña
+// @access  Private/Admin
+router.post('/campaigns/:id/resend', auth, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Buscar la campaña
+    const campaign = await EmailCampaign.findById(id);
+    if (!campaign) {
+      return res.status(404).json({ message: 'Campaña no encontrada' });
+    }
+
+    // Solo permitir reenviar campañas enviadas o fallidas
+    if (campaign.status === 'draft') {
+      return res.status(400).json({ message: 'No se puede reenviar una campaña en borrador' });
+    }
+
+    if (campaign.status === 'sending') {
+      return res.status(400).json({ message: 'La campaña ya se está enviando' });
+    }
+
+    // Actualizar estado a enviando
+    campaign.status = 'sending';
+    campaign.lastSentAt = new Date();
+    await campaign.save();
+
+    // Obtener todas las suscripciones activas
+    const activeSubscriptions = await Subscription.find({ status: 'active' });
+
+    if (activeSubscriptions.length === 0) {
+      campaign.status = 'failed';
+      await campaign.save();
+      return res.status(400).json({ message: 'No hay suscriptores activos' });
+    }
+
+    // Configurar el transportador de nodemailer
+    const transporter = nodemailer.createTransporter({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+    let sentCount = 0;
+    let failedCount = 0;
+
+    // Enviar emails en lotes para evitar sobrecargar el servidor
+    const batchSize = 10;
+    for (let i = 0; i < activeSubscriptions.length; i += batchSize) {
+      const batch = activeSubscriptions.slice(i, i + batchSize);
+      
+      const promises = batch.map(async (subscription) => {
+        try {
+          await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: subscription.email,
+            subject: campaign.subject,
+            html: campaign.htmlContent,
+            text: campaign.textContent
+          });
+          sentCount++;
+        } catch (error) {
+          console.error(`Error enviando email a ${subscription.email}:`, error);
+          failedCount++;
+        }
+      });
+
+      await Promise.all(promises);
+      
+      // Pequeña pausa entre lotes
+      if (i + batchSize < activeSubscriptions.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    // Actualizar estadísticas de la campaña
+    campaign.sentCount += sentCount;
+    campaign.failedCount += failedCount;
+    campaign.deliveredCount = campaign.sentCount - campaign.failedCount;
+    campaign.status = failedCount === activeSubscriptions.length ? 'failed' : 'sent';
+    
+    await campaign.save();
+
+    res.json({
+      message: 'Campaña reenviada exitosamente',
+      campaign,
+      stats: {
+        sent: sentCount,
+        failed: failedCount,
+        total: activeSubscriptions.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Error reenviando campaña:', error);
+    
+    // Actualizar estado a fallido en caso de error
+    try {
+      await EmailCampaign.findByIdAndUpdate(id, { status: 'failed' });
+    } catch (updateError) {
+      console.error('Error actualizando estado de campaña:', updateError);
+    }
+    
     res.status(500).json({ message: 'Error del servidor' });
   }
 });

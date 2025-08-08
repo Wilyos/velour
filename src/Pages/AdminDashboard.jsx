@@ -11,6 +11,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [subscriptionFilter, setSubscriptionFilter] = useState('all');
+  const [campaignFilter, setCampaignFilter] = useState('all');
   const [deletingSubscriptions, setDeletingSubscriptions] = useState(false);
   const [sessionTimer, setSessionTimer] = useState('');
 
@@ -79,7 +80,10 @@ const AdminDashboard = () => {
     if (activeTab === 'subscriptions' && isAuthenticated) {
       loadAllSubscriptions();
     }
-  }, [activeTab, subscriptionFilter, isAuthenticated]);
+    if (activeTab === 'campaigns' && isAuthenticated) {
+      loadAllCampaigns();
+    }
+  }, [activeTab, subscriptionFilter, campaignFilter, isAuthenticated]);
 
   const loadDashboardData = async () => {
     try {
@@ -127,6 +131,28 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error loading subscriptions:', error);
+    }
+  };
+
+  const loadAllCampaigns = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      const params = new URLSearchParams();
+      if (campaignFilter !== 'all') {
+        params.append('status', campaignFilter);
+      }
+
+      const response = await apiRequest(`/api/admin/campaigns?${params}`, { headers });
+      if (response.ok) {
+        const data = await response.json();
+        setCampaigns(data.campaigns || []);
+      }
+    } catch (error) {
+      console.error('Error loading campaigns:', error);
     }
   };
 
@@ -420,6 +446,92 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteCampaign = async (campaignId, campaignSubject) => {
+    if (!confirm(`¿Estás seguro de eliminar la campaña "${campaignSubject}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await apiRequest(`/api/admin/campaigns/${campaignId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (response.ok) {
+        alert('Campaña eliminada exitosamente');
+        // Actualizar la lista local
+        setCampaigns(prev => prev.filter(campaign => campaign._id !== campaignId));
+        loadDashboardData();
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + (errorData.message || 'No se pudo eliminar la campaña'));
+      }
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      alert('Error al eliminar la campaña');
+    }
+  };
+
+  const handleDuplicateCampaign = async (campaign) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await apiRequest(`/api/admin/campaigns/${campaign._id}/duplicate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Campaña duplicada exitosamente: "${data.subject}"`);
+        loadDashboardData();
+        loadAllCampaigns(); // Recargar la lista filtrada también
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + (errorData.message || 'No se pudo duplicar la campaña'));
+      }
+    } catch (error) {
+      console.error('Error duplicating campaign:', error);
+      alert('Error al duplicar la campaña');
+    }
+  };
+
+  const handleResendCampaign = async (campaignId, campaignSubject) => {
+    if (!confirm(`¿Estás seguro de que quieres reenviar la campaña "${campaignSubject}" a todos los suscriptores?`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await apiRequest(`/api/admin/campaigns/${campaignId}/resend`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Campaña reenviada exitosamente. Enviados: ${data.stats.sent}, Fallidos: ${data.stats.failed}`);
+        loadDashboardData();
+        loadAllCampaigns(); // Recargar la lista
+      } else {
+        const errorData = await response.json();
+        alert('Error: ' + (errorData.message || 'No se pudo reenviar la campaña'));
+      }
+    } catch (error) {
+      console.error('Error resending campaign:', error);
+      alert('Error al reenviar la campaña');
+    }
+  };
+
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
   }
@@ -667,12 +779,25 @@ const AdminDashboard = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900">Gestión de Campañas</h3>
-              <button
-                onClick={() => setShowCampaignForm(true)}
-                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                Nueva Campaña
-              </button>
+              <div className="flex gap-3">
+                <select
+                  value={campaignFilter}
+                  onChange={(e) => setCampaignFilter(e.target.value)}
+                  className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="all">Todas</option>
+                  <option value="draft">Borradores</option>
+                  <option value="sent">Enviadas</option>
+                  <option value="sending">Enviando</option>
+                  <option value="failed">Fallidas</option>
+                </select>
+                <button
+                  onClick={() => setShowCampaignForm(true)}
+                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Nueva Campaña
+                </button>
+              </div>
             </div>
 
             {/* Campaign Form Modal */}
@@ -834,40 +959,135 @@ const AdminDashboard = () => {
             {/* Campaigns List */}
             <div className="bg-white rounded-lg shadow">
               <div className="p-6">
-                <div className="space-y-4">
-                  {campaigns.map((campaign) => (
-                    <div key={campaign._id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{campaign.subject}</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Tipo: {campaign.type} | Estado: {campaign.status}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-2">
-                            Creado: {new Date(campaign.createdAt).toLocaleDateString()}
-                          </p>
+                {campaigns.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-4">No hay campañas creadas aún.</p>
+                    <button
+                      onClick={() => setShowCampaignForm(true)}
+                      className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                      Crear Primera Campaña
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {campaigns.map((campaign) => (
+                      <div key={campaign._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h4 className="font-medium text-gray-900 text-lg">{campaign.subject || campaign.title}</h4>
+                              <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                                campaign.status === 'sent' ? 'bg-green-100 text-green-800' :
+                                campaign.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+                                campaign.status === 'sending' ? 'bg-blue-100 text-blue-800' :
+                                campaign.status === 'failed' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {campaign.status === 'sent' ? 'Enviada' :
+                                 campaign.status === 'draft' ? 'Borrador' :
+                                 campaign.status === 'sending' ? 'Enviando...' :
+                                 campaign.status === 'failed' ? 'Falló' : campaign.status}
+                              </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
+                              <div>
+                                <span className="font-medium">Tipo:</span> {campaign.templateType || campaign.type || 'newsletter'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Creado:</span> {new Date(campaign.createdAt).toLocaleDateString()}
+                              </div>
+                              {campaign.sentAt && (
+                                <div>
+                                  <span className="font-medium">Enviado:</span> {new Date(campaign.sentAt).toLocaleDateString()}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Estadísticas de envío */}
+                            {campaign.status === 'sent' && (
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3">
+                                <div className="bg-blue-50 p-2 rounded">
+                                  <div className="text-blue-800 font-medium">📧 Enviados</div>
+                                  <div className="text-blue-600">{campaign.sentCount || campaign.recipientCount || 0}</div>
+                                </div>
+                                <div className="bg-green-50 p-2 rounded">
+                                  <div className="text-green-800 font-medium">✅ Exitosos</div>
+                                  <div className="text-green-600">{campaign.successCount || 0}</div>
+                                </div>
+                                <div className="bg-red-50 p-2 rounded">
+                                  <div className="text-red-800 font-medium">❌ Fallos</div>
+                                  <div className="text-red-600">{campaign.failureCount || campaign.failedCount || 0}</div>
+                                </div>
+                                <div className="bg-purple-50 p-2 rounded">
+                                  <div className="text-purple-800 font-medium">👁️ Aperturas</div>
+                                  <div className="text-purple-600">{campaign.openCount || 0}</div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex space-x-2">
+
+                        {/* Botones de acción */}
+                        <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                          {/* Enviar campaña */}
                           {campaign.status === 'draft' && (
                             <button
                               onClick={() => handleSendCampaign(campaign._id)}
-                              className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                              className="inline-flex items-center px-3 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                              title="Enviar campaña"
                             >
-                              Enviar
+                              📤 Enviar
                             </button>
                           )}
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            campaign.status === 'sent' ? 'bg-green-100 text-green-800' :
-                            campaign.status === 'draft' ? 'bg-gray-100 text-gray-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
-                            {campaign.status}
-                          </span>
+
+                          {/* Reenviar campaña */}
+                          {(campaign.status === 'sent' || campaign.status === 'failed') && (
+                            <button
+                              onClick={() => handleResendCampaign(campaign._id, campaign.subject || campaign.title)}
+                              className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                              title="Reenviar campaña a todos los suscriptores"
+                            >
+                              🔄 Reenviar
+                            </button>
+                          )}
+
+                          {/* Duplicar campaña */}
+                          <button
+                            onClick={() => handleDuplicateCampaign(campaign)}
+                            className="inline-flex items-center px-3 py-1.5 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+                            title="Duplicar campaña"
+                          >
+                            📋 Duplicar
+                          </button>
+
+                          {/* Ver estadísticas detalladas */}
+                          {campaign.status === 'sent' && (
+                            <button
+                              onClick={() => alert('Función de estadísticas detalladas próximamente')}
+                              className="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors"
+                              title="Ver estadísticas detalladas"
+                            >
+                              📊 Estadísticas
+                            </button>
+                          )}
+
+                          {/* Eliminar campaña */}
+                          {(campaign.status === 'draft' || campaign.status === 'failed') && (
+                            <button
+                              onClick={() => handleDeleteCampaign(campaign._id, campaign.subject || campaign.title)}
+                              className="inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+                              title="Eliminar campaña"
+                            >
+                              🗑️ Eliminar
+                            </button>
+                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
