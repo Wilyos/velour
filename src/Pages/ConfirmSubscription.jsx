@@ -11,7 +11,9 @@ const ConfirmSubscription = () => {
     const confirmSubscription = async () => {
       try {
         console.log('🔄 Intentando confirmar token:', token);
-        const response = await apiRequest(`/api/subscriptions/confirm/${token}`);
+        // Agregar timestamp para evitar caché del navegador
+        const timestamp = new Date().getTime();
+        const response = await apiRequest(`/api/subscriptions/confirm/${token}?v=${timestamp}`);
         console.log('📡 Respuesta recibida:', {
           status: response.status,
           ok: response.ok,
@@ -32,6 +34,7 @@ const ConfirmSubscription = () => {
         }
       } catch (error) {
         console.error('💥 Error capturado:', error);
+        console.error('💥 Error stack:', error.stack);
         setStatus('error');
         setMessage('Error de conexión. Por favor intenta más tarde.');
       }
