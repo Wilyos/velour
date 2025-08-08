@@ -19,7 +19,14 @@ const AdminDashboard = () => {
   const [newCampaign, setNewCampaign] = useState({
     subject: '',
     content: '',
-    type: 'newsletter'
+    type: 'newsletter',
+    // Nuevos campos para generar HTML automáticamente
+    title: '',
+    mainMessage: '',
+    callToAction: '',
+    ctaUrl: '',
+    additionalInfo: '',
+    footer: ''
   });
 
   // Actualizar timer de sesión
@@ -252,22 +259,110 @@ const AdminDashboard = () => {
     }
   };
 
+  // Función para generar HTML automáticamente
+  const generateCampaignHTML = (campaignData) => {
+    const { title, mainMessage, callToAction, ctaUrl, additionalInfo, footer } = campaignData;
+    
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${campaignData.subject}</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #D4A574, #B8956A); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+    .title { font-size: 28px; font-weight: bold; margin-bottom: 20px; text-align: center; color: #8B5A3C; }
+    .message { font-size: 16px; line-height: 1.8; margin-bottom: 25px; }
+    .cta-container { text-align: center; margin: 30px 0; }
+    .cta-button { 
+      display: inline-block; 
+      background: #8B5A3C; 
+      color: white; 
+      padding: 15px 30px; 
+      text-decoration: none; 
+      border-radius: 8px; 
+      font-weight: bold;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    .cta-button:hover { background: #6D4330; }
+    .additional-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #D4A574; }
+    .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px; }
+    .logo { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">VELOUR</div>
+      <p>Cuidado capilar premium</p>
+    </div>
+    <div class="content">
+      ${title ? `<h1 class="title">${title}</h1>` : ''}
+      
+      ${mainMessage ? `<div class="message">${mainMessage.replace(/\n/g, '<br>')}</div>` : ''}
+      
+      ${callToAction && ctaUrl ? `
+      <div class="cta-container">
+        <a href="${ctaUrl}" class="cta-button">${callToAction}</a>
+      </div>
+      ` : ''}
+      
+      ${additionalInfo ? `
+      <div class="additional-info">
+        ${additionalInfo.replace(/\n/g, '<br>')}
+      </div>
+      ` : ''}
+    </div>
+    <div class="footer">
+      ${footer ? footer.replace(/\n/g, '<br>') : ''}
+      <p>© 2025 Velour. Todos los derechos reservados.</p>
+      <p>¿No deseas recibir más emails? <a href="[UNSUBSCRIBE_URL]" style="color: #8B5A3C;">Cancelar suscripción</a></p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+  };
+
   const handleCreateCampaign = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
+      
+      // Generar el HTML automáticamente
+      const generatedHTML = generateCampaignHTML(newCampaign);
+      
+      const campaignToSend = {
+        ...newCampaign,
+        content: generatedHTML
+      };
+      
       const response = await apiRequest('/api/admin/campaigns', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(newCampaign)
+        body: JSON.stringify(campaignToSend)
       });
 
       if (response.ok) {
         alert('Campaña creada exitosamente');
         setShowCampaignForm(false);
-        setNewCampaign({ subject: '', content: '', type: 'newsletter' });
+        setNewCampaign({ 
+          subject: '', 
+          content: '', 
+          type: 'newsletter',
+          title: '',
+          mainMessage: '',
+          callToAction: '',
+          ctaUrl: '',
+          additionalInfo: '',
+          footer: ''
+        });
         loadDashboardData();
       }
     } catch (error) {
@@ -556,50 +651,139 @@ const AdminDashboard = () => {
             {/* Campaign Form Modal */}
             {showCampaignForm && (
               <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                   <div className="p-6">
                     <h4 className="text-lg font-medium mb-4">Crear Nueva Campaña</h4>
                     <form onSubmit={handleCreateCampaign} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Asunto
-                        </label>
-                        <input
-                          type="text"
-                          value={newCampaign.subject}
-                          onChange={(e) => setNewCampaign({...newCampaign, subject: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          required
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Columna izquierda - Información básica */}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Asunto del Email *
+                            </label>
+                            <input
+                              type="text"
+                              value={newCampaign.subject}
+                              onChange={(e) => setNewCampaign({...newCampaign, subject: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="Ej: ¡Nueva colección de productos Velour!"
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Tipo de Campaña
+                            </label>
+                            <select
+                              value={newCampaign.type}
+                              onChange={(e) => setNewCampaign({...newCampaign, type: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            >
+                              <option value="newsletter">Newsletter</option>
+                              <option value="promotion">Promoción</option>
+                              <option value="announcement">Anuncio</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Título Principal *
+                            </label>
+                            <input
+                              type="text"
+                              value={newCampaign.title}
+                              onChange={(e) => setNewCampaign({...newCampaign, title: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="Ej: ¡Descubre nuestra nueva línea!"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Botón de Acción
+                            </label>
+                            <input
+                              type="text"
+                              value={newCampaign.callToAction}
+                              onChange={(e) => setNewCampaign({...newCampaign, callToAction: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="Ej: Ver Productos, Comprar Ahora, Leer Más..."
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Enlace del Botón
+                            </label>
+                            <input
+                              type="url"
+                              value={newCampaign.ctaUrl}
+                              onChange={(e) => setNewCampaign({...newCampaign, ctaUrl: e.target.value})}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="https://velourvitalize.com/productos"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Columna derecha - Contenido */}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Mensaje Principal *
+                            </label>
+                            <textarea
+                              value={newCampaign.mainMessage}
+                              onChange={(e) => setNewCampaign({...newCampaign, mainMessage: e.target.value})}
+                              rows={6}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="Escribe el mensaje principal que quieres enviar a tus suscriptores..."
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Información Adicional
+                            </label>
+                            <textarea
+                              value={newCampaign.additionalInfo}
+                              onChange={(e) => setNewCampaign({...newCampaign, additionalInfo: e.target.value})}
+                              rows={4}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="Información extra, detalles, beneficios, etc..."
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Mensaje de Cierre
+                            </label>
+                            <textarea
+                              value={newCampaign.footer}
+                              onChange={(e) => setNewCampaign({...newCampaign, footer: e.target.value})}
+                              rows={3}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              placeholder="¡Gracias por ser parte de la familia Velour!"
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Tipo
-                        </label>
-                        <select
-                          value={newCampaign.type}
-                          onChange={(e) => setNewCampaign({...newCampaign, type: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        >
-                          <option value="newsletter">Newsletter</option>
-                          <option value="promotion">Promoción</option>
-                          <option value="announcement">Anuncio</option>
-                        </select>
+
+                      {/* Vista previa */}
+                      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h5 className="text-sm font-medium text-gray-700 mb-2">Vista Previa:</h5>
+                        <div className="text-xs text-gray-600 max-h-32 overflow-y-auto bg-white p-3 rounded border">
+                          <strong>Asunto:</strong> {newCampaign.subject || 'Sin asunto'}<br/>
+                          <strong>Título:</strong> {newCampaign.title || 'Sin título'}<br/>
+                          <strong>Mensaje:</strong> {newCampaign.mainMessage ? newCampaign.mainMessage.substring(0, 100) + '...' : 'Sin mensaje'}<br/>
+                          {newCampaign.callToAction && <span><strong>Botón:</strong> {newCampaign.callToAction}</span>}
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Contenido (HTML)
-                        </label>
-                        <textarea
-                          value={newCampaign.content}
-                          onChange={(e) => setNewCampaign({...newCampaign, content: e.target.value})}
-                          rows={10}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
-                          placeholder="<h2>Título de la campaña</h2><p>Contenido del email...</p>"
-                          required
-                        />
-                      </div>
-                      <div className="flex justify-end space-x-3">
+
+                      <div className="flex justify-end space-x-3 pt-4 border-t">
                         <button
                           type="button"
                           onClick={() => setShowCampaignForm(false)}
