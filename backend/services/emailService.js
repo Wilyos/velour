@@ -31,10 +31,19 @@ class EmailService {
 
   // Email de confirmación de suscripción
   async sendConfirmationEmail(email, token) {
-    // Usar la URL correcta según el entorno
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? (process.env.FRONTEND_URL || 'https://velourvitalize.com')
-      : 'http://localhost:5173';
+    // Forzar el uso de la URL de producción si no está en desarrollo local
+    const isLocalDev = process.env.NODE_ENV !== 'production' && !process.env.RAILWAY_ENVIRONMENT_NAME;
+    const baseUrl = isLocalDev 
+      ? 'http://localhost:5173'
+      : 'https://velourvitalize.com';
+    
+    console.log('Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      RAILWAY_ENVIRONMENT_NAME: process.env.RAILWAY_ENVIRONMENT_NAME,
+      FRONTEND_URL: process.env.FRONTEND_URL,
+      isLocalDev,
+      baseUrl
+    });
     
     const confirmUrl = `${baseUrl}/confirm-subscription/${token}`;
     
@@ -162,7 +171,7 @@ class EmailService {
             </div>
             
             <div style="text-align: center;">
-              <a href="${process.env.NODE_ENV === 'production' ? (process.env.FRONTEND_URL || 'https://velourvitalize.com') : 'http://localhost:5173'}" class="cta-button">EXPLORAR PRODUCTOS</a>
+              <a href="${isLocalDev ? 'http://localhost:5173' : 'https://velourvitalize.com'}" class="cta-button">EXPLORAR PRODUCTOS</a>
             </div>
             
             <p>Como miembro de nuestra comunidad, serás el primero en conocer:</p>
