@@ -121,6 +121,87 @@ router.delete('/subscriptions/:id', auth, isAdmin, async (req, res) => {
     }
 
     await Subscription.findByIdAndDelete(req.params.id);
+    
+    res.json({ 
+      message: 'Suscripción eliminada exitosamente',
+      deletedSubscription: {
+        id: subscription._id,
+        email: subscription.email
+      }
+    });
+
+  } catch (error) {
+    console.error('Error eliminando suscripción:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   DELETE /api/admin/subscriptions/pending
+// @desc    Eliminar todas las suscripciones pendientes
+// @access  Private/Admin
+router.delete('/subscriptions/pending', auth, isAdmin, async (req, res) => {
+  try {
+    const result = await Subscription.deleteMany({ isConfirmed: false });
+    
+    res.json({ 
+      message: `${result.deletedCount} suscripciones pendientes eliminadas exitosamente`,
+      deletedCount: result.deletedCount
+    });
+
+  } catch (error) {
+    console.error('Error eliminando suscripciones pendientes:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   PUT /api/admin/subscriptions/:id/confirm
+// @desc    Confirmar manualmente una suscripción
+// @access  Private/Admin
+router.put('/subscriptions/:id/confirm', auth, isAdmin, async (req, res) => {
+  try {
+    const subscription = await Subscription.findById(req.params.id);
+    
+    if (!subscription) {
+      return res.status(404).json({ message: 'Suscripción no encontrada' });
+    }
+
+    subscription.isConfirmed = true;
+    subscription.isActive = true;
+    subscription.confirmedAt = new Date();
+    await subscription.save();
+    
+    res.json({ 
+      message: 'Suscripción confirmada exitosamente',
+      subscription
+    });
+
+  } catch (error) {
+    console.error('Error confirmando suscripción:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+        limit
+      }
+    });
+
+  } catch (error) {
+    console.error('Error obteniendo suscripciones:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// @route   DELETE /api/admin/subscriptions/:id
+// @desc    Eliminar una suscripción
+// @access  Private/Admin
+router.delete('/subscriptions/:id', auth, isAdmin, async (req, res) => {
+  try {
+    const subscription = await Subscription.findById(req.params.id);
+    
+    if (!subscription) {
+      return res.status(404).json({ message: 'Suscripción no encontrada' });
+    }
+
+    await Subscription.findByIdAndDelete(req.params.id);
 
     res.json({ message: 'Suscripción eliminada exitosamente' });
 
