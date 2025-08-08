@@ -109,6 +109,34 @@ router.get('/me', auth, async (req, res) => {
   });
 });
 
+// @route   POST /api/auth/refresh
+// @desc    Renovar token de autenticación
+// @access  Private
+router.post('/refresh', auth, async (req, res) => {
+  try {
+    // Generar nuevo token con la misma información del usuario
+    const token = jwt.sign(
+      { userId: req.user._id, role: req.user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role
+      }
+    });
+
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
 // @route   POST /api/auth/change-password
 // @desc    Cambiar contraseña
 // @access  Private
