@@ -1,4 +1,4 @@
-import fondo from '../assets/banners/banner-hero.png'
+import fondo from '../assets/banners/banner-hero-2.png'
 
 const Hero = () => {
   return (
