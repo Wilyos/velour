@@ -63,7 +63,7 @@ const ConfirmSubscription = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center yanone-kaffeesatz">
+    <div className="min-h-screen bg-secondary flex items-center justify-center yanone-kaffeesatz">
       <div className="max-w-md mx-auto text-center p-8">
         <div className="bg-white rounded-lg shadow-lg p-8">
           {status === 'success' ? (

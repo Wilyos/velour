@@ -1,5 +1,5 @@
-import bannerA from '../assets/banners/banner-2.png';
-import bannerB from '../assets/banners/banner-about-us.png';
+import bannerA from '../assets/banners/banner-2-1-1.png';
+import bannerB from '../assets/banners/banner-aboutUs-2.png';
 import { HiArrowLongRight } from "react-icons/hi2";
 import { Link } from 'react-router-dom';
 
@@ -64,13 +64,13 @@ const AboutUs = () => {
                     </div>
                 </div>
                 <div class="relative rounded-lg lg:h-64 md:h-48 h-40 lg:min-w-24 md:w-48 w-40 overflow-hidden mx-auto">
-                    <img alt="content" class="object-cover object-center h-full w-full z-0" src="/assets/about-model2.jpg" />
+                    <img alt="content" class="object-cover object-center h-full w-full z-0" src="/assets/model22.png" />
                     <div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-morado text-secondary p-1 content-center items-center rounded-full lg:text-2xl md:text-xl text-lg lg:w-32 md:w-28 w-24 text-center hover:bg-secondary hover:text-morado'>
                         <Link to="/shampoo" className=''>Shampoo</Link>
                     </div>
                 </div>
                 <div class="relative rounded-lg lg:h-64 md:h-48 h-40 lg:w-auto md:w-48 w-40 overflow-hidden mx-auto">
-                    <img alt="content" class="object-cover object-center h-full w-full" src="/assets/about-model1.png" />
+                    <img alt="content" class="object-cover object-center h-full w-full" src="/assets/model1.png" />
                     <div className='absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-morado text-secondary p-1 content-center items-center rounded-full lg:text-2xl md:text-xl text-lg lg:w-32 md:w-28 w-24 text-center hover:bg-secondary hover:text-morado'>
                         <Link to="/tratamiento" className=''>Tratamiento</Link>
                     </div>

@@ -2,7 +2,7 @@ import bgContacto from '../assets/img/bg-contact-form.png'
 import Concact from '../components/Concact'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
-import imgForm from '../assets/img/mujer-formulario.jpg'
+import imgForm from '../assets/img/model-contact2.jpg'
 import { useContactForm } from '../hooks/useContactForm'
 
 const FormContact = () => {
