@@ -2,6 +2,10 @@ import { useLocation, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { FaSearch, FaArrowRight } from "react-icons/fa";
+import { GiSpiralBottle } from "react-icons/gi";
+import { LuNewspaper } from "react-icons/lu";
+import { BsFillInfoSquareFill } from "react-icons/bs";
+import { FaQuestion } from "react-icons/fa6";
 
 const SearchResults = () => {
   const location = useLocation();
@@ -143,10 +147,10 @@ const SearchResults = () => {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'Producto': return '🧴';
-      case 'Sección': return '📋';
-      case 'Página': return '📄';
-      default: return '📝';
+      case 'Producto': return <GiSpiralBottle />;
+      case 'Sección': return <BsFillInfoSquareFill />;
+      case 'Página': return <LuNewspaper />;
+      default: return <FaQuestion />;
     }
   };
 
