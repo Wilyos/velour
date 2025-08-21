@@ -1,5 +1,7 @@
 import bannerA from '../assets/banners/banner-2-1-1.png';
 import bannerB from '../assets/banners/banner-aboutUs-2.png';
+import bannerAMovil from '../assets/banners/banner-v2.png';
+import bannerBMovil from '../assets/banners/banner-v3.png';
 import { HiArrowLongRight } from "react-icons/hi2";
 import { Link } from 'react-router-dom';
 
@@ -48,7 +50,10 @@ const AboutUs = () => {
             </div>
         </section>
         <section className='bg-white yanone-kaffeesatz'>
-            <img src={bannerA} alt="info" className="w-full" />
+            {/* Desktop bannerA */}
+            <img src={bannerA} alt="info" className="w-full hidden sm:block" />
+            {/* Mobile bannerA */}
+            <img src={bannerAMovil} alt="info móvil" className="w-full block sm:hidden" />
             <div class="container lg:px-40 md:px-20 px-5 lg:py-24 md:py-16 py-12 mx-auto flex lg:flex-row md:flex-col flex-col lg:space-x-40 md:space-x-0 space-x-0 lg:space-y-0 md:space-y-8 space-y-6 content-center items-center">
                 <div class="lg:w-1/4 md:w-full w-full lg:pl-6 md:pl-0 pl-0 lg:text-left md:text-center text-center">
                     <h2 className='text-morado lg:text-6xl md:text-5xl text-4xl font-semibold lg:mb-4 md:mb-3 mb-2'>
@@ -77,7 +82,10 @@ const AboutUs = () => {
                 </div>
               
             </div>
-            <img src={bannerB} alt="sobre nosotros" className="w-full" />
+            {/* Desktop bannerB */}
+            <img src={bannerB} alt="sobre nosotros" className="w-full hidden sm:block" />
+            {/* Mobile bannerB */}
+            <img src={bannerBMovil} alt="sobre nosotros móvil" className="w-full block sm:hidden" />
         </section>
     </>
   )
