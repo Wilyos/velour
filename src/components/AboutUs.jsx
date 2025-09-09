@@ -1,7 +1,7 @@
 import bannerA from '../assets/banners/banner-av2.png';
 import bannerB from '../assets/banners/bannerb-v2.png';
-import bannerAMovil from '../assets/banners/banner-v2.png';
-import bannerBMovil from '../assets/banners/banner-v3.png';
+import bannerAMovil from '../assets/banners/bannervr3.png';
+import bannerBMovil from '../assets/banners/banner vr4.png';
 import { HiArrowLongRight } from "react-icons/hi2";
 import { Link } from 'react-router-dom';
 
