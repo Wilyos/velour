@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import bgContact from '../assets/img/bg-concact.png';
+import bgContact from '../assets/banners/backgroundlow.png';
 import { FaFacebookF, FaTiktok, FaYoutube, FaInstagram } from "react-icons/fa";
 import { apiRequest } from '../utils/api';
 
@@ -83,7 +83,7 @@ const Concact = () => {
           
           {/* Formulario de suscripción */}
           <form onSubmit={handleSubmit} className="flex w-full justify-center items-center mb-4 md:mb-8 px-2">
-            <div className="flex flex-col sm:flex-row items-center w-full max-w-2xl bg-secondary/50 rounded-full border border-secondary overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-center w-full max-w-2xl bg-white/50 rounded-full border border-secondary overflow-hidden">
               <input
                 type="email"
                 value={email}
