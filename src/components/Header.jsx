@@ -23,8 +23,18 @@ const Header = () => {
   }
 
   const handleSearch = () => {
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+    const term = searchTerm.trim();
+    if (term) {
+      // Meta Pixel: evento de búsqueda
+      if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+        try {
+          window.fbq('track', 'Search', {
+            search_string: term,
+            content_category: 'Site Search'
+          });
+        } catch {}
+      }
+      navigate(`/search?q=${encodeURIComponent(term)}`);
       setIsMenuOpen(false); // Cerrar menú si está abierto
     }
   }
