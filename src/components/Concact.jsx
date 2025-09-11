@@ -38,15 +38,41 @@ const Concact = () => {
       if (response.ok) {
         setMessage(data.message);
         setMessageType('success');
+        // Meta Pixel: lead generado por suscripción en contacto
+        if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+          try {
+            window.fbq('track', 'Lead', {
+              content_name: 'Contacto - Suscripción',
+              content_category: 'Newsletter',
+              status: 'success',
+              value: 1,
+              currency: 'COP'
+            });
+          } catch {}
+        }
         setEmail(''); // Limpiar el formulario
       } else {
         setMessage(data.message || 'Error al suscribirse');
         setMessageType('error');
+        // Meta Pixel: opcional, registrar intento fallido
+        if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+          try {
+            window.fbq('trackCustom', 'ContactSubscribeError', {
+              reason: data.message || 'unknown'
+            });
+          } catch {}
+        }
       }
     } catch (error) {
       console.error('Error:', error);
       setMessage('Error de conexión. Por favor intenta más tarde.');
       setMessageType('error');
+      // Meta Pixel: opcional, error de red
+      if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+        try {
+          window.fbq('trackCustom', 'ContactSubscribeNetworkError');
+        } catch {}
+      }
     } finally {
       setIsLoading(false);
     }

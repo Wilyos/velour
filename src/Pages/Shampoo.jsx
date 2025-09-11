@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import bgProduct from '../assets/img/bg-product.png';
@@ -15,6 +15,25 @@ import { useSearch } from './SearchContext.jsx';
 const Shampoo = () => {
   const [mainImage, setMainImage] = useState(shampooFront);
   const {searchTerm} = useSearch();
+
+  // Meta Pixel: ViewContent al montar la página de Shampoo
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+    window.__fbqOnce = window.__fbqOnce || {};
+    const key = 'view_shampoo';
+    if (window.__fbqOnce[key]) return;
+    try {
+      window.fbq('track', 'ViewContent', {
+        content_name: 'Shampoo Revitalizador',
+        content_category: 'Shampoo',
+        content_ids: ['shampoo'],
+        content_type: 'product',
+        value: 60000,
+        currency: 'COP'
+      });
+      window.__fbqOnce[key] = true;
+    } catch {}
+  }, []);
 
   const beneficiosFiltrados = [
     'Mejora fuerza y brillo capilar',

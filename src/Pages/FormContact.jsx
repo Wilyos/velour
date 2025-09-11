@@ -4,6 +4,7 @@ import Footer from '../components/Footer'
 import Header from '../components/Header'
 import imgForm from '../assets/img/model-contact2.jpg'
 import { useContactForm } from '../hooks/useContactForm'
+import { useEffect } from 'react'
 
 const FormContact = () => {
   const { 
@@ -14,6 +15,25 @@ const FormContact = () => {
     submitForm, 
     resetForm 
   } = useContactForm();
+
+    // Meta Pixel: evento de Contact al completar el formulario
+    useEffect(() => {
+        if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+            if (submitStatus === 'success') {
+            try {
+                    window.fbq('track', 'Contact', {
+                    content_name: 'Formulario de Contacto',
+                        status: 'success',
+                        value: 1,
+                        currency: 'COP'
+                });
+            } catch {}
+        } else if (submitStatus === 'error') {
+            try {
+                window.fbq('trackCustom', 'ContactFormError');
+            } catch {}
+        }
+    }, [submitStatus]);
 
   return (
     <>

@@ -1,5 +1,5 @@
 import Header from "../components/Header"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Footer from "../components/Footer"
 import bgProduct from '../assets/img/bg-product.png';
 import ttmFront from '../assets/img/tratamiento.png';
@@ -16,6 +16,25 @@ const Tratamiento = () => {
     
       const [mainImage, setMainImage] = useState(ttmFront);
     
+  // Meta Pixel: ViewContent al montar la página de Tratamiento
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+    window.__fbqOnce = window.__fbqOnce || {};
+    const key = 'view_tratamiento';
+    if (window.__fbqOnce[key]) return;
+    try {
+      window.fbq('track', 'ViewContent', {
+        content_name: 'Tratamiento Reparador',
+        content_category: 'Tratamiento',
+        content_ids: ['tratamiento'],
+        content_type: 'product',
+        value: 69900,
+        currency: 'COP'
+      });
+      window.__fbqOnce[key] = true;
+    } catch {}
+  }, []);
+
   return (
     <>
         <Header />

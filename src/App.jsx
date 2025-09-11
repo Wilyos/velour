@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import AboutUs from "./components/AboutUs";
 import Concact from "./components/Concact";
 import Footer from "./components/Footer";
@@ -44,6 +45,14 @@ function HomePage() {
 }
 
 function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+      window.fbq('track', 'PageView');
+    }
+  }, [location.pathname, location.search]);
+
   return (
     <AuthProvider>
       <Routes>
