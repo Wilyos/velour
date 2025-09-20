@@ -60,46 +60,7 @@ const Header = () => {
   return (
     <header className="text-primary body-font yanone-kaffeesatz bg-white w-full relative">
       {/* Top nav */}
-      <div className="container mx-auto flex flex-row items-center justify-between p-3">
-        {/* Logo pequeño o espacio vacío */}
-        <div className="flex title-font font-medium items-center text-gray-900">
-          <span className="ml-3 text-xl"></span>
-        </div>
-        
-        {/* Elementos de la derecha: carrito, búsqueda y menú hamburguesa */}
-        <div className="flex items-center gap-2">
-          {/* Carrito */}
-          <a className="hover:text-gray-900">
-            <MdOutlineAddShoppingCart className="text-primary font-semibold text-2xl cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300" />
-          </a>
-          
-          {/* Búsqueda - oculta en móvil, visible en desktop */}
-          <div className="relative hidden md:flex">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Buscar productos, secciones..."
-              className="bg-secondary/50 px-4 py-1 rounded-l-md border-2 border-secondary focus:outline-none text-primary w-64"
-            />
-            <button
-              onClick={handleSearch}
-              className="bg-white px-4 py-1 rounded-r-md text-primary hover:text-accent transition"
-            >
-              <TbZoom />
-            </button>
-          </div>
-          
-          {/* Botón hamburguesa */}
-          <button
-            onClick={toggleMenu}
-            className="text-primary text-2xl md:hidden transition ease-in-out delay-150 hover:text-accent"
-          >
-            {isMenuOpen ? <HiX /> : <HiMenu />}
-          </button>
-        </div>
-      </div>
+      
 
       {/* Búsqueda móvil - aparece cuando el menú está abierto */}
       {isMenuOpen && (
@@ -124,14 +85,46 @@ const Header = () => {
       )}
 
       {/* Fondo y logo */}
+
       <div className="relative bg-[url('/assets/fondo-logo.png')] bg-cover bg-center h-[120px] md:h-[150px] flex flex-col md:flex-row justify-center items-center">
         <img
           src={logob}
           alt="logo"
           className="w-2/3 max-w-[300px] md:max-w-[500px] mx-auto"
         />
-        {/* Redes sociales */}
-        <div className="absolute bottom-2 right-2 md:top-8 md:right-20 flex gap-2 md:gap-4 text-lg md:text-xl bg-white/80 rounded-full px-2 py-1 md:bg-transparent md:rounded-none md:px-0 md:py-0">
+        {/* Redes y carrito/menú en barra inferior solo en móvil */}
+        <div className="w-full flex justify-between items-center px-4 py-2 md:hidden absolute left-0 bottom-0">
+          {/* Redes sociales a la izquierda */}
+          <div className="flex gap-2 text-lg">
+            <Link to="#" onClick={() => window.open('https://facebook.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+              <FaFacebookF />
+            </Link>
+            <Link to="#" onClick={() => window.open('https://instagram.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+              <FaInstagram />
+            </Link>
+            <Link to="#" onClick={() => window.open('https://tiktok.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+              <FaTiktok />
+            </Link>
+            <Link to="#" onClick={() => window.open('https://wa.me/573001112233', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+              <FaWhatsapp />
+            </Link>
+          </div>
+          {/* Carrito y menú hamburguesa a la derecha */}
+          <div className="flex items-center gap-2">
+            <a className="hover:text-gray-900">
+              <MdOutlineAddShoppingCart className="text-primary font-semibold text-2xl cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300" />
+            </a>
+            <button
+              onClick={toggleMenu}
+              className="text-primary text-2xl transition ease-in-out delay-150 hover:text-accent"
+            >
+              {isMenuOpen ? <HiX /> : <HiMenu />}
+            </button>
+          </div>
+        </div>
+
+        {/* Redes sociales en desktop (posición original) */}
+        <div className="hidden md:flex absolute top-8 right-20 gap-4 text-xl bg-transparent">
           <Link to="#" onClick={() => window.open('https://facebook.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
             <FaFacebookF />
           </Link>

@@ -2,8 +2,8 @@ import Header from "../components/Header"
 import { useState, useEffect } from "react";
 import Footer from "../components/Footer"
 import bgProduct from '../assets/img/bg-product.png';
-import ttmFront from '../assets/img/tratamiento.png';
-import ttmBack from '../assets/img/tratamiento2.png';
+import ttmFront from '../assets/img/tratamientov2.webp';
+import ttmBack from '../assets/img/tratamientoback2.webp';
 import { FaStar } from "react-icons/fa";
 import Concact from '../components/Concact.jsx';
 import payCard from '../assets/iconos/pay-card.png'

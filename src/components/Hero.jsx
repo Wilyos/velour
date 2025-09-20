@@ -1,6 +1,6 @@
 
 import fondo from '../assets/banners/hero-bannerv3.png';
-import fondoMovil from '../assets/banners/bannervr2.png';
+import fondoMovil from '../assets/banners/bannervr201.webp';
 
 
 const Hero = () => {

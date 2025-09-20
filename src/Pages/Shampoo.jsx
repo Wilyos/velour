@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import bgProduct from '../assets/img/bg-product.png';
-import shampooFront from '../assets/img/shampoofront.png';
-import shampooBack from '../assets/img/shampooback.png';
+import shampooFront from '../assets/img/shampoofrontv2.webp';
+import shampooBack from '../assets/img/shampoobackv2.webp';
 import { FaStar } from "react-icons/fa";
 import Contact from '../components/Concact.jsx';
 import payCard from '../assets/iconos/pay-card.png'
@@ -115,7 +115,7 @@ const Shampoo = () => {
 
               {/* Precio y opciones */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-5 mb-5">
-                <span className="text-2xl md:text-3xl font-medium text-primary">$60.000 COP</span>
+                <span className="text-2xl md:text-3xl font-medium text-primary">$29.900 COP</span>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Tamaño:</span>
                   <select className="rounded border border-secondary py-2 px-3 text-sm bg-white">
