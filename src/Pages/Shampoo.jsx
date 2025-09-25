@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import bgProduct from '../assets/img/bg-product.png';
-import shampooFront from '../assets/img/shampoofrontv2.webp';
-import shampooBack from '../assets/img/shampoobackv2.webp';
+import shampooFront from '../assets/img/shampov2front.png';
+import shampooBack from '../assets/img/shampov2back.png';
 import { FaStar } from "react-icons/fa";
 import Contact from '../components/Concact.jsx';
 import payCard from '../assets/iconos/pay-card.png'
@@ -58,7 +58,7 @@ const Shampoo = () => {
               <div className="w-full max-w-md">
                 <img
                   alt="producto principal"
-                  className="w-full h-auto object-cover rounded-xl shadow-lg"
+                  className="w-full h-auto object-cover rounded-xl shadow-lg bg-secondary/10"
                   src={mainImage}
                 />
 
