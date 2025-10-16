@@ -147,7 +147,7 @@ const Concact = () => {
             
             <div className="flex gap-3 md:gap-4">
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/velourvitalize" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
@@ -155,7 +155,7 @@ const Concact = () => {
                 <FaInstagram className="text-lg md:text-xl hover:text-secondary" />
               </a>
               <a 
-                href="https://facebook.com" 
+                href="https://www.facebook.com/share/15HL8a5SZAe/?mibextid=wwXIfr" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
@@ -163,21 +163,14 @@ const Concact = () => {
                 <FaFacebookF className="text-lg md:text-xl hover:text-secondary" />
               </a>
               <a 
-                href="https://tiktok.com" 
+                href="https://www.tiktok.com/@velourvitalize?_t=ZS-90bBGU2KWYP&_r=1" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
               >
                 <FaTiktok className="text-lg md:text-xl hover:text-secondary" />
               </a>
-              <a 
-                href="https://youtube.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-transparent text-primary flex items-center justify-center border-2 border-primary hover:bg-primary hover:text-secondary transition-all duration-300 hover:scale-110"
-              >
-                <FaYoutube className="text-lg md:text-xl hover:text-secondary" />
-              </a>
+              
             </div>
           </div>
         </div>

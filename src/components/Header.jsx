@@ -96,18 +96,16 @@ const Header = () => {
         <div className="w-full flex justify-between items-center px-4 py-2 md:hidden absolute left-0 bottom-0">
           {/* Redes sociales a la izquierda */}
           <div className="flex gap-2 text-lg">
-            <Link to="#" onClick={() => window.open('https://facebook.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+            <Link to="#" onClick={() => window.open('www.facebook.com/share/15HL8a5SZAe/?mibextid=wwXIfr', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
               <FaFacebookF />
             </Link>
-            <Link to="#" onClick={() => window.open('https://instagram.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+            <Link to="#" onClick={() => window.open('https://www.instagram.com/velourvitalize', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
               <FaInstagram />
             </Link>
-            <Link to="#" onClick={() => window.open('https://tiktok.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+            <Link to="#" onClick={() => window.open('https://www.tiktok.com/@velourvitalize?_t=ZS-90bBGU2KWYP&_r=1', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
               <FaTiktok />
             </Link>
-            <Link to="#" onClick={() => window.open('https://wa.me/573001112233', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
-              <FaWhatsapp />
-            </Link>
+           
           </div>
           {/* Carrito y menú hamburguesa a la derecha */}
           <div className="flex items-center gap-2">
@@ -125,18 +123,16 @@ const Header = () => {
 
         {/* Redes sociales en desktop (posición original) */}
         <div className="hidden md:flex absolute top-8 right-20 gap-4 text-xl bg-transparent">
-          <Link to="#" onClick={() => window.open('https://facebook.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+          <Link to="#" onClick={() => window.open('www.facebook.com/share/15HL8a5SZAe/?mibextid=wwXIfr', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
             <FaFacebookF />
           </Link>
-          <Link to="#" onClick={() => window.open('https://instagram.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+          <Link to="#" onClick={() => window.open('https://www.instagram.com/velourvitalize', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
             <FaInstagram />
           </Link>
-          <Link to="#" onClick={() => window.open('https://tiktok.com', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
+          <Link to="#" onClick={() => window.open('https://www.tiktok.com/@velourvitalize?_t=ZS-90bBGU2KWYP&_r=1', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
             <FaTiktok />
           </Link>
-          <Link to="#" onClick={() => window.open('https://wa.me/573001112233', '_blank')} className="text-[#5B1D1D] cursor-pointer transition ease-in-out delay-150 hover:text-accent hover:-translate-y-1 hover:scale-110 duration-300">
-            <FaWhatsapp />
-          </Link>
+          
         </div>
       </div>
       
